@@ -1,0 +1,1015 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Calendar Hub - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #ff6b6b;
+            --accent-soft: #ee5a6f;
+            --surface: #ffffff;
+            --bg: #f8f9fa;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --border: #e1e8ed;
+            --success: #00b894;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* Header */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .navbar-brand {
+            font-family: 'Crimson Pro', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--border);
+        }
+
+        /* Settings Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            background: var(--surface);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-user-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal-body {
+            padding: 8px 0;
+            overflow: hidden;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: var(--bg);
+        }
+
+        .menu-item-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--text-light);
+            flex-shrink: 0;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .menu-item-description {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .menu-item.danger .menu-item-title {
+            color: var(--accent);
+        }
+
+        .menu-item.danger .menu-item-icon {
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 20px;
+        }
+
+        .welcome-section {
+            margin-bottom: 48px;
+            animation: fadeInContent 0.6s ease;
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-section h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 42px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .welcome-section p {
+            font-size: 18px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        /* Magic Input Section */
+        .magic-input-container {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.06),
+                0 0 1px rgba(0, 0, 0, 0.08);
+            margin-bottom: 32px;
+            animation: slideUpContent 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @keyframes slideUpContent {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .magic-input {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-family: 'DM Sans', sans-serif;
+            border: none;
+            background: transparent;
+            color: var(--text);
+        }
+
+        .magic-input:focus {
+            outline: none;
+        }
+
+        .magic-input::placeholder {
+            color: var(--text-light);
+        }
+
+        /* Send Request Button */
+        .btn-send {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.25);
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
+        }
+
+        .btn-send:active {
+            transform: scale(0.95);
+        }
+
+        .btn-send svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        /* Add File Button */
+        .btn-add-file {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.25);
+            flex-shrink: 0;
+        }
+
+        .btn-add-file:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
+        }
+
+        .btn-add-file:active {
+            transform: scale(0.95);
+        }
+
+        .btn-add-file svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Uploaded Files List */
+        .uploaded-files {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .uploaded-files.show {
+            display: block;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .file-icon svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-remove:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--accent);
+        }
+
+        /* Quick Examples */
+        .quick-examples {
+            margin-top: 32px;
+            animation: slideUpContent 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+        }
+
+        .examples-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .example-chip {
+            padding: 10px 16px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .example-chip:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-section h1 {
+                font-size: 32px;
+            }
+
+            .magic-input-container {
+                padding: 28px 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-secondary {
+                width: 100%;
+            }
+
+            .settings-modal {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand" href="index.html">
+                    <div class="brand-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    Smart Calendar Hub
+                </a>
+                <div class="user-menu">
+                    <button class="btn-icon" onclick="toggleSettingsModal()" title="Settings">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Non-blocking success toast -->
+    <div id="addSuccessToast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:1100;display:none;">
+        <div style="background:linear-gradient(135deg,var(--accent) 0%,var(--accent-soft) 100%);color:#fff;padding:10px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);font-weight:600;">Added successfully</div>
+    </div>
+    <!-- Error toast for AI parse and other errors -->
+    <div id="errorToast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:1100;display:none;">
+        <div style="background:#fff5f5;border-left:4px solid #e74c3c;color:#c0392b;padding:10px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.06);font-weight:600;">Error</div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal" onclick="closeModalOnOverlay(event)">
+        <div class="settings-modal">
+            <div class="modal-header">
+                <div class="modal-user-info">
+                    <div class="modal-user-name" id="settingsUsername">Username</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <button class="menu-item" onclick="window.location.href='connect_to_calendar.html'">
+                    <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Connect to Calendar</div>
+                    </div>
+                </button>
+                <button class="menu-item danger" onclick="logout()">
+                    <svg class="menu-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Sign Out</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logoutConfirm" onclick="closeLogoutOnOverlay(event)">
+        <div class="settings-modal" role="dialog" aria-labelledby="logoutTitle" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-user-info">
+                    <div class="modal-user-name" id="logoutTitle">Confirm Sign Out</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div style="padding:16px 24px; color:var(--text-light);">
+                    Are you sure you want to sign out? You will return to the sign-in screen.
+                    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:18px;">
+                        <button onclick="closeLogoutConfirm()" style="padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;">Cancel</button>
+                        <button onclick="confirmLogout()" style="padding:10px 14px; border-radius:10px; border:none; background:linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%); color:#fff; cursor:pointer;">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Connect Prompt Modal (shown when user not connected) -->
+    <div class="modal-overlay" id="googleConnectModal" onclick="if(event.target===this) closeGoogleConnectModal()">
+        <div class="settings-modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-user-name">Please connect to your Google Calendar</div>
+            </div>
+            <div class="modal-body" style="padding:20px 24px; text-align:center;">
+                <p style="color:var(--text-light); margin-bottom:18px;">To sync events you need to connect your Google Calendar.</p>
+                <div style="display:flex; justify-content:center; gap:12px;">
+                    <a href="connect_to_calendar.html" class="btn" style="background:linear-gradient(135deg,var(--accent) 0%,var(--accent-soft) 100%); color:#fff; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:600;">Connect</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div class="modal-overlay" id="processingModal">
+        <div class="settings-modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-user-name">Processing...</div>
+            </div>
+            <div class="modal-body" style="padding:20px 24px; text-align:center;">
+                <p style="color:var(--text-light); margin-bottom:0;">AI is working on your request.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 id="welcomeTitle">Create your schedule</h1>
+            <p>Describe it in natural language and let AI schedule everything</p>
+        </div>
+
+        <!-- Magic Input Container -->
+        <div class="magic-input-container">
+            <input 
+                type="text" 
+                id="magicInput" 
+                class="magic-input" 
+                placeholder="Type anything you want to do...">
+            <!-- Send Request Button -->
+            <button class="btn-send" id="sendBtn" onclick="processInput()" title="Send request">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+            </button>
+            <!-- Add File Button -->
+            <button class="btn-add-file" onclick="document.getElementById('fileInput').click()" title="Upload file">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+            </button>
+            <input type="file" id="fileInput" multiple accept="*/*">
+        </div>
+
+        <!-- Uploaded Files List -->
+        <div class="uploaded-files" id="uploadedFiles"></div>
+
+        <!-- Quick Examples -->
+        <div class="quick-examples">
+            <div class="examples-label">Quick examples</div>
+            <div class="example-chips">
+                <div class="example-chip" onclick="fillExample('Team stand-up tomorrow at 10am')">Team stand-up tomorrow at 10am</div>
+                <div class="example-chip" onclick="fillExample('Work out every Friday at 5pm for 1 hour')">Work out every Friday at 5pm for 1 hour</div>
+                <div class="example-chip" onclick="fillExample('Remind me to renew Netflix on the 1st of next month')">Remind me to renew Netflix on the 1st of next month</div>
+                <div class="example-chip" onclick="fillExample('Vacation March 10–15')">Vacation March 10–15</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/events-api.js' %}"></script>
+    <script>
+        function getTimeGreeting() {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) return 'Good morning';
+            if (hour >= 12 && hour < 18) return 'Good afternoon';
+            return 'Good evening';
+        }
+
+        if (window.authHelpers) {
+            window.authHelpers.requireAuth({
+                onUser: (user) => {
+                    const nameEl = document.getElementById('settingsUsername');
+                    const welcomeEl = document.getElementById('welcomeTitle');
+                    if (nameEl && user && user.username) {
+                        nameEl.textContent = user.username;
+                    }
+                    if (welcomeEl && user && user.username) {
+                        welcomeEl.textContent = `${getTimeGreeting()}，${user.username}`;
+                    }
+                    maybePromptGoogleConnect(user);
+                }
+            });
+        }
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFiles = document.getElementById('uploadedFiles');
+        const magicInput = document.getElementById('magicInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        let files = [];
+        let isProcessing = false;
+
+        // File input handler
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Handle Enter key to process input
+        magicInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                processInput();
+            }
+        });
+
+        // Settings Modal Functions
+        function toggleSettingsModal() {
+            settingsModal.classList.toggle('show');
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === settingsModal) {
+                settingsModal.classList.remove('show');
+            }
+        }
+        
+        function logout() {
+            // Close settings modal and show styled confirmation modal
+            settingsModal.classList.remove('show');
+            const logoutConfirm = document.getElementById('logoutConfirm');
+            if (logoutConfirm) logoutConfirm.classList.add('show');
+        }
+
+        function closeLogoutOnOverlay(event) {
+            if (event.target && event.target.id === 'logoutConfirm') {
+                document.getElementById('logoutConfirm').classList.remove('show');
+            }
+        }
+
+        function closeLogoutConfirm() {
+            const el = document.getElementById('logoutConfirm');
+            if (el) el.classList.remove('show');
+        }
+
+        function confirmLogout() {
+            // Close the confirmation modal
+            closeLogoutConfirm();
+            
+            // Call logout and let it handle the redirect
+            if (window.authHelpers && window.authHelpers.authLogout) {
+                window.authHelpers.authLogout();
+            } else {
+                // Fallback: direct redirect if authHelpers not available
+                window.location.href = '/login.html';
+            }
+        }
+
+        function handleFiles(newFiles) {
+            files = [...files, ...Array.from(newFiles)];
+            displayFiles();
+        }
+
+        function displayFiles() {
+            if (files.length === 0) {
+                uploadedFiles.classList.remove('show');
+                return;
+            }
+
+            uploadedFiles.classList.add('show');
+            uploadedFiles.innerHTML = files.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button class="btn-remove" onclick="removeFile(${index})">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function removeFile(index) {
+            files.splice(index, 1);
+            displayFiles();
+        }
+
+        function fillExample(text) {
+            magicInput.value = text;
+            magicInput.focus();
+        }
+
+        function clearInput() {
+            magicInput.value = '';
+            files = [];
+            displayFiles();
+            fileInput.value = '';
+        }
+
+        async function processInput() {
+            if (isProcessing) {
+                return;
+            }
+            // Check input not empty
+            const input = document.getElementById('magicInput').value.trim();
+            if (!input) {
+                const toast = document.getElementById('errorToast');
+                if (toast) {
+                    toast.textContent = '❌ Please enter something';
+                    toast.style.display = 'block';
+                    setTimeout(() => toast.style.display = 'none', 3000);
+                }
+                return;
+            }
+
+            setProcessingState(true);
+
+            const connected = await ensureGoogleConnected();
+            if (!connected) {
+                setProcessingState(false);
+                return;
+            }
+
+            // Call AI parse endpoint and redirect to add_plan_backend with parsed data
+            try {
+                const csrf = (function(){
+                    const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+                    return cookieValue ? cookieValue.split('=')[1] : '';
+                })();
+
+                const res = await fetch('/api/ai/parse/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ text: input })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    const msg = err && err.error ? err.error : 'AI parsing request failed';
+                    const toast = document.getElementById('errorToast');
+                    if (toast) {
+                        toast.firstElementChild.textContent = 'AI解析错误: ' + msg;
+                        toast.style.display = 'block';
+                        setTimeout(() => toast.style.display = 'none', 6000);
+                    }
+                    setProcessingState(false);
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data.ok || !data.data) {
+                    const msg = data && data.error ? data.error : 'AI returned no data';
+                    const toast = document.getElementById('errorToast');
+                    if (toast) {
+                        toast.firstElementChild.textContent = 'AI解析错误: ' + msg;
+                        toast.style.display = 'block';
+                        setTimeout(() => toast.style.display = 'none', 6000);
+                    }
+                    setProcessingState(false);
+                    return;
+                }
+
+                // Expect parsed structure: { events: [ {...} ] }
+                const parsed = data.data;
+                const events = parsed.events || [];
+                if (!events.length) {
+                    const toast = document.getElementById('errorToast');
+                    if (toast) {
+                        toast.firstElementChild.textContent = 'AI解析错误: 未检测到事件';
+                        toast.style.display = 'block';
+                        setTimeout(() => toast.style.display = 'none', 6000);
+                    }
+                    setProcessingState(false);
+                    return;
+                }
+
+                // Pass all parsed events to the form for multi-event flow
+                const jsonStr = JSON.stringify(parsed);
+                const csrfToken = getCookie('csrftoken') || '';
+                // Always use server-side stash to avoid client storage issues
+                try {
+                    const stashRes = await fetch('/api/ai/stash/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ data: parsed })
+                    });
+                    const stashData = await stashRes.json();
+                    if (stashRes.ok && stashData && stashData.key) {
+                        window.location.href = `/add_plan_backend.html?data_key=${stashData.key}&mode=ai&stash=1`;
+                    } else {
+                        throw new Error('Failed to stash AI data');
+                    }
+                } catch (err) {
+                    console.error('Failed to stash AI data', err);
+                    const toast = document.getElementById('errorToast');
+                    if (toast) {
+                        toast.firstElementChild.textContent = 'AI解析错误: 传输失败，请重试';
+                        toast.style.display = 'block';
+                        setTimeout(() => toast.style.display = 'none', 6000);
+                    }
+                    setProcessingState(false);
+                    return;
+                }
+            } catch (err) {
+                console.error('AI parse error', err);
+                const toast = document.getElementById('errorToast');
+                if (toast) {
+                    toast.firstElementChild.textContent = 'AI解析错误: 网络或服务异常';
+                    toast.style.display = 'block';
+                    setTimeout(() => toast.style.display = 'none', 6000);
+                }
+                setProcessingState(false);
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && settingsModal.classList.contains('show')) {
+                settingsModal.classList.remove('show');
+            }
+        });
+
+        // Show add-success toast if redirected from add_plan_backend (demo)
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('added') === '1') {
+                const toast = document.getElementById('addSuccessToast');
+                if (toast) {
+                    toast.style.display = 'block';
+                    setTimeout(() => { toast.style.opacity = '1'; }, 50);
+                    // auto-hide after 3s
+                    setTimeout(() => { toast.style.transition = 'opacity 0.4s'; toast.style.opacity = '0'; setTimeout(() => { toast.style.display = 'none'; }, 400); }, 3000);
+                }
+                // remove query param without reload
+                params.delete('added');
+                const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                history.replaceState({}, '', newUrl);
+            }
+        });
+
+        function showGoogleConnectModal() {
+            const modal = document.getElementById('googleConnectModal');
+            if (modal) modal.classList.add('show');
+        }
+
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+            return null;
+        }
+
+        function showProcessingModal() {
+            const modal = document.getElementById('processingModal');
+            if (modal) modal.classList.add('show');
+        }
+
+        function hideProcessingModal() {
+            const modal = document.getElementById('processingModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function setProcessingState(active) {
+            isProcessing = !!active;
+            if (active) {
+                showProcessingModal();
+            } else {
+                hideProcessingModal();
+            }
+            if (sendBtn) {
+                sendBtn.disabled = !!active;
+                sendBtn.style.opacity = active ? '0.6' : '1';
+                sendBtn.style.cursor = active ? 'not-allowed' : 'pointer';
+            }
+            if (magicInput) {
+                magicInput.disabled = !!active;
+            }
+        }
+
+        // Fetch current Google OAuth connection status
+        async function fetchGoogleOAuthStatus(options = {}) {
+            try {
+                const url = options.firstLogin ? '/api/google/status/?first_login=1' : '/api/google/status/';
+                const res = await fetch(url, { credentials: 'include' });
+                if (!res.ok) return null; // don't bother user on error
+                const data = await res.json();
+                if (data && data.ok) {
+                    return data;
+                }
+                return null;
+            } catch (e) {
+                // silent fail
+                console.debug('Google status check failed', e);
+                return null;
+            }
+        }
+
+        // Ensure Google is connected before sending
+        async function ensureGoogleConnected() {
+            const status = await fetchGoogleOAuthStatus();
+            if (!status || status.connected !== true) {
+                showGoogleConnectModal();
+                return false;
+            }
+            return true;
+        }
+
+        // First-login prompt (per user)
+        async function maybePromptGoogleConnect(user) {
+            if (!user) return;
+            const status = await fetchGoogleOAuthStatus({ firstLogin: true });
+            if (status && status.should_prompt) {
+                showGoogleConnectModal();
+            }
+        }
+
+        function closeGoogleConnectModal() {
+            const modal = document.getElementById('googleConnectModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function resetProcessingStateOnLoad() {
+            setProcessingState(false);
+        }
+
+        // Ensure processing modal never persists when returning to dashboard
+        document.addEventListener('DOMContentLoaded', resetProcessingStateOnLoad);
+        window.addEventListener('pageshow', resetProcessingStateOnLoad);
+
+        // No auto-check on load; prompts only on first login or send.
+    </script>
+</body>
+</html>

@@ -1,0 +1,1715 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Calendar Hub - Confirm Schedule</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #ff6b6b;
+            --accent-soft: #ee5a6f;
+            --surface: #ffffff;
+            --bg: #f8f9fa;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --border: #e1e8ed;
+            --success: #00b894;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* Header */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .navbar-brand {
+            font-family: 'Crimson Pro', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg);
+            border: none;
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        /* Settings / Confirmation Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .settings-modal {
+            background: var(--surface);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header { padding: 20px 20px 12px 20px; border-bottom: 1px solid var(--border); }
+        .modal-user-name { font-size: 18px; font-weight: 600; color: var(--primary); }
+        .modal-body { padding: 8px 0 20px 0; }
+
+        /* Main Content */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+            color: var(--text-light);
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Container */
+        .form-container {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.06),
+                0 0 1px rgba(0, 0, 0, 0.08);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .label-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--accent);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .form-control.is-disabled {
+            background: #f1f3f5;
+            color: var(--text-light);
+            border-color: #e3e6ea;
+            cursor: not-allowed;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-control.textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-control.error {
+            border-color: #e74c3c;
+        }
+
+        .error-text {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-text.show {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-hint {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .ai-progress {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* All Day Toggle Switch */
+        .all-day-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .toggle-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.3s ease;
+            left: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::before {
+            left: 24px;
+        }
+
+        /* Time Fields */
+        .datetime-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .datetime-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .time-separator {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .time-separator-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-confirm:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-confirm:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .btn-confirm:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            padding: 16px 32px;
+            background: var(--bg);
+            color: var(--text);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: var(--border);
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(255, 107, 107, 0.08);
+            border-left: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        .info-box svg {
+            width: 20px;
+            height: 20px;
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: var(--text);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fff5f5;
+            border-left: 4px solid #e74c3c;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            display: none;
+            color: #c0392b;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 28px 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column-reverse;
+            }
+
+            .btn-cancel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand" href="dashboard.html">
+                    <div class="brand-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    Smart Calendar Hub
+                </a>
+                <a href="dashboard.html" class="btn-back">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+            <button type="submit" form="eventForm" class="btn-confirm" id="submitBtnTop">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Save Event
+            </button>
+        </div>
+        <div class="page-header">
+            <div class="ai-badge">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                AI parsed
+            </div>
+            <h1>Confirm schedule details</h1>
+            <p>Please review and edit the details extracted by AI</p>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div>
+                <p>AI has parsed your input. You can edit any field; when everything looks right, click the button below to create the schedule.</p>
+                <div class="ai-progress" id="aiEventProgress" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <form class="form-container" id="eventForm">
+            <!-- Event Title -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                    </svg>
+                    Title
+                </label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="eventTitle"
+                    name="title"
+                    placeholder="Enter event title"
+                    required>
+            </div>
+
+            <!-- All Day Toggle -->
+            <div class="all-day-toggle">
+                <span class="toggle-label">All Day</span>
+                <button type="button" class="toggle-switch" id="allDayToggle" onclick="toggleAllDay(event)"></button>
+            </div>
+
+            <!-- Start Date/Time -->
+            <div id="dateTimeFields">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Starts
+                        </label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="eventDate"
+                            name="date"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Time
+                        </label>
+                        <input 
+                            type="time" 
+                            class="form-control" 
+                            id="startTime"
+                            name="start_time"
+                            placeholder="09:00 AM">
+                    </div>
+                </div>
+
+                <!-- End Date/Time -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Ends
+                        </label>
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="eventEndDate"
+                            name="end_date">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Time
+                        </label>
+                        <input 
+                            type="time" 
+                            class="form-control" 
+                            id="endTime"
+                            name="end_time">
+                    </div>
+                </div>
+
+                <!-- Duration (fallback for non-All-Day) -->
+                <div class="form-group" id="durationField" style="display: none;">
+                    <label class="form-label">
+                        <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Duration (minutes)
+                    </label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="duration"
+                        name="duration"
+                        placeholder="60"
+                        min="5"
+                        step="5">
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Add Location or Video Call
+                </label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="location"
+                    name="location"
+                    placeholder="Add a location or video call link">
+            </div>
+
+            <!-- Repeat -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Repeat
+                </label>
+                <select class="form-control" id="repeat" name="repeat">
+                    <option value="never">Never</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Every 2 weeks</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+
+            <!-- Reminder -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    Alert
+                </label>
+                <select class="form-control" id="reminder" name="reminder">
+                    <option value="0">None</option>
+                    <option value="0">At start time</option>
+                    <option value="5">5 minutes before</option>
+                    <option value="10">10 minutes before</option>
+                    <option value="15" selected>15 minutes before</option>
+                    <option value="30">30 minutes before</option>
+                    <option value="60">1 hour before</option>
+                    <option value="1440">1 day before</option>
+                </select>
+            </div>
+
+            <!-- Travel Time -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Travel Time
+                </label>
+                <select class="form-control" id="travelTime" name="travel_time">
+                    <option value="0" selected>None</option>
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">1 hour</option>
+                </select>
+            </div>
+
+            <!-- Show As -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Show As
+                </label>
+                <select class="form-control" id="showAs" name="show_as">
+                    <option value="busy" selected>Busy</option>
+                    <option value="free">Free</option>
+                </select>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    Category
+                </label>
+                <select class="form-control" id="category" name="category">
+                    <option value="work" selected>Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="appointment">Appointment</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <!-- Attendees -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    Add Invitees
+                </label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="participants"
+                    name="participants"
+                    placeholder="Email only, separated by commas">
+                <div class="input-hint">Email only, separated by commas.</div>
+                <div class="error-text" id="participantsError">Invalid email format. Use comma-separated emails.</div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label class="form-label">
+                    <svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                    </svg>
+                    Add Notes or URL
+                </label>
+                <textarea 
+                    class="form-control textarea" 
+                    id="description"
+                    name="description"
+                    placeholder="Add notes, attachments, or links"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+                <button type="submit" class="btn-confirm" id="submitBtn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Save Event
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script>
+        if (window.authHelpers) {
+            window.authHelpers.requireAuth();
+        }
+
+        // ============================================================================
+        // ALL DAY TOGGLE FUNCTIONALITY
+        // ============================================================================
+        
+        const allDayToggle = document.getElementById('allDayToggle');
+        const durationField = document.getElementById('durationField');
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+        const eventEndDate = document.getElementById('eventEndDate');
+        const participantsInput = document.getElementById('participants');
+        const participantsError = document.getElementById('participantsError');
+
+        function toggleAllDay(event) {
+            event.preventDefault();
+            const nextState = !allDayToggle.classList.contains('active');
+            setAllDayState(nextState, { enforceValues: false });
+        }
+
+        function setAllDayState(isAllDay, options = {}) {
+            const enforceValues = options.enforceValues !== false;
+            if (isAllDay) {
+                allDayToggle.classList.add('active');
+                startTimeInput.disabled = true;
+                endTimeInput.disabled = true;
+                startTimeInput.classList.add('is-disabled');
+                endTimeInput.classList.add('is-disabled');
+                durationField.style.display = 'none';
+                startTimeInput.required = false;
+                endTimeInput.required = false;
+                if (enforceValues) {
+                    startTimeInput.value = startTimeInput.value || '00:00';
+                    endTimeInput.value = endTimeInput.value || '23:59';
+                }
+            } else {
+                allDayToggle.classList.remove('active');
+                startTimeInput.disabled = false;
+                endTimeInput.disabled = false;
+                startTimeInput.classList.remove('is-disabled');
+                endTimeInput.classList.remove('is-disabled');
+                durationField.style.display = 'block';
+                startTimeInput.required = true;
+                endTimeInput.required = true;
+            }
+            updateValidationState();
+        }
+
+        // Auto-calculate end time based on duration
+        const durationInput = document.getElementById('duration');
+        const eventDateInput = document.getElementById('eventDate');
+
+        function updateEndTime() {
+            if (!eventDateInput.value || !startTimeInput.value) {
+                return;
+            }
+            if (allDayToggle.classList.contains('active')) {
+                return;
+            }
+            
+            const [hours, minutes] = startTimeInput.value.split(':').map(Number);
+            const duration = parseInt(durationInput.value, 10) || 60;
+            
+            let totalMinutes = hours * 60 + minutes + duration;
+            let endHours = Math.floor(totalMinutes / 60) % 24;
+            let endMinutes = totalMinutes % 60;
+            
+            const endTimeFormatted = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+            endTimeInput.value = endTimeFormatted;
+            
+            // Set end date (same date unless duration crosses midnight)
+            eventEndDate.value = eventDateInput.value;
+        }
+
+        eventDateInput.addEventListener('change', updateEndTime);
+        startTimeInput.addEventListener('change', updateEndTime);
+        durationInput.addEventListener('change', updateEndTime);
+
+        function validateParticipants() {
+            if (!participantsInput || !participantsError) return true;
+            const value = participantsInput.value.trim();
+            if (!value) {
+                participantsInput.classList.remove('error');
+                participantsError.classList.remove('show');
+                return true;
+            }
+            const { invalid } = validateParticipantsValue(value);
+            if (invalid.length) {
+                participantsInput.classList.add('error');
+                participantsError.classList.add('show');
+                return false;
+            }
+            participantsInput.classList.remove('error');
+            participantsError.classList.remove('show');
+            return true;
+        }
+
+        function validateParticipantsValue(value) {
+            const parts = value.split(',').map(p => p.trim()).filter(Boolean);
+            const emailRe = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+            const invalid = parts.filter(p => !emailRe.test(p));
+            return { parts, invalid };
+        }
+
+        function sanitizeParticipantsValue(value) {
+            if (!value) return '';
+            const { parts, invalid } = validateParticipantsValue(value);
+            if (invalid.length) return '';
+            return parts.join(', ');
+        }
+
+        function extractExplicitTime(text) {
+            if (!text) return null;
+            const match = text.match(/(上午|下午|晚上|中午|傍晚|夜里|夜间|早上|凌晨)?\s*(\d{1,2})[:：](\d{2})/);
+            if (!match) return null;
+            let hour = parseInt(match[2], 10);
+            const minute = match[3];
+            const period = match[1] || '';
+            if (/(下午|晚上|傍晚|夜里|夜间)/.test(period)) {
+                if (hour < 12) hour += 12;
+            } else if (/中午/.test(period)) {
+                if (hour < 11) hour += 12;
+            } else if (/(凌晨|早上|上午)/.test(period)) {
+                if (hour === 12) hour = 0;
+            }
+            const hh = String(hour).padStart(2, '0');
+            return `${hh}:${minute}`;
+        }
+
+        if (participantsInput) {
+            participantsInput.addEventListener('input', validateParticipants);
+            participantsInput.addEventListener('blur', validateParticipants);
+        }
+
+        // ============================================================================
+        // BACKEND INTEGRATION VERSION
+        // ============================================================================
+
+        // Configuration
+        const API_BASE_URL = '/api';  // Adjust this to your Django API endpoint
+        // Demo mode: skip backend submission and show confirmation modal
+        const DEMO_MODE = false;
+        // AI split prompt (front-end reference; keep here for AI-driven tokenization stability)
+        const AI_SPLIT_PROMPT = `You are a strict event splitter and extractor.
+Goal: Split the user's input into multiple event items with maximum stability.
+Rules:
+1) Output ONLY JSON with the shape {"events":[{...}]} and no extra text.
+2) Each event must be a single standalone item. If an item is ambiguous, keep it but set unclear fields to null.
+3) Do NOT merge unrelated items. Prefer more events over fewer when sentences list multiple tasks.
+4) If no explicit time is provided, set start_time to null and duration to null.
+5) Dates can be relative but must be resolved by the caller (CURRENT_DATE).
+Schema fields per event:
+title, date, start_time, duration, location, description, participants, reminder, category, repeat, all_day, notes.
+Return null for missing fields.`;
+        
+        // Get event ID from URL parameters (if editing existing event)
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+        const aiData = urlParams.get('data');  // AI-parsed data in JSON format (legacy)
+        const aiDataB64 = urlParams.get('data_b64');
+        const aiDataKey = urlParams.get('data_key');
+        const aiDataFromStash = urlParams.get('stash') === '1';
+        let aiEventQueue = [];
+        let aiEventIndex = 0;
+        let aiMode = false;
+
+        /**
+         * Get CSRF Token from Django
+         */
+        function getCsrfToken() {
+            // First try to get from cookie
+            const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            if (cookieValue) {
+                return cookieValue.split('=')[1];
+            }
+            
+            // Fallback: get from meta tag
+            const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfElement) {
+                return csrfElement.value;
+            }
+            
+            return '';
+        }
+
+        // ============================================================================
+        // DATE AND TIME VALIDATION
+        // ============================================================================
+        
+        // Validation regex patterns
+        const datePattern = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+        const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+        // Get form elements
+        const dateError = document.getElementById('dateError');
+        const timeError = document.getElementById('timeError');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitBtnTop = document.getElementById('submitBtnTop');
+        const eventForm = document.getElementById('eventForm');
+
+        // Validate date format
+        function validateDate(dateString) {
+            if (!datePattern.test(dateString)) {
+                return false;
+            }
+            
+            // Additional validation: check if date is valid
+            const parts = dateString.split('-');
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            
+            const date = new Date(year, month - 1, day);
+            return date.getFullYear() === year && 
+                   date.getMonth() === month - 1 && 
+                   date.getDate() === day;
+        }
+
+        // Validate time format
+        function validateTime(timeString) {
+            return timePattern.test(timeString);
+        }
+
+        // Update form validation state
+        function updateValidationState() {
+            const dateValue = eventDateInput.value.trim();
+            const timeValue = startTimeInput.value.trim();
+            
+            let isValid = true;
+
+            // Validate date (always required)
+            if (dateValue === '') {
+                eventDateInput.classList.remove('error');
+                if (dateError) dateError.classList.remove('show');
+            } else if (!validateDate(dateValue)) {
+                eventDateInput.classList.add('error');
+                if (dateError) dateError.classList.add('show');
+                isValid = false;
+            } else {
+                eventDateInput.classList.remove('error');
+                if (dateError) dateError.classList.remove('show');
+            }
+
+            // Validate time only if not all-day
+            if (!allDayToggle.classList.contains('active')) {
+                if (timeValue === '') {
+                    startTimeInput.classList.remove('error');
+                    if (timeError) timeError.classList.remove('show');
+                } else if (!validateTime(timeValue)) {
+                    startTimeInput.classList.add('error');
+                    if (timeError) timeError.classList.add('show');
+                    isValid = false;
+                } else {
+                    startTimeInput.classList.remove('error');
+                    if (timeError) timeError.classList.remove('show');
+                }
+            } else {
+                startTimeInput.classList.remove('error');
+                if (timeError) timeError.classList.remove('show');
+            }
+
+            // Update submit button state
+            if (!isValid) {
+                if (submitBtn) {
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+                if (submitBtnTop) {
+                    submitBtnTop.style.opacity = '0.5';
+                    submitBtnTop.style.cursor = 'not-allowed';
+                }
+            } else {
+                if (submitBtn) {
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+                if (submitBtnTop) {
+                    submitBtnTop.style.opacity = '1';
+                    submitBtnTop.style.cursor = 'pointer';
+                }
+            }
+
+            return isValid;
+        }
+
+        // Add event listeners for real-time validation
+        eventDateInput.addEventListener('input', updateValidationState);
+        startTimeInput.addEventListener('input', updateValidationState);
+
+        // ============================================================================
+        // AI MULTI-EVENT SUPPORT
+        // ============================================================================
+
+        function normalizeAiPayload(parsedData) {
+            console.log('[normalizeAiPayload] Processing:', parsedData);
+            if (!parsedData) {
+                console.warn('[normalizeAiPayload] No data provided');
+                return [];
+            }
+            
+            // If it's an object with an 'events' key, use that array
+            if (parsedData.events && Array.isArray(parsedData.events)) {
+                console.log('[normalizeAiPayload] Found events array:', parsedData.events.length, 'items');
+                return parsedData.events;
+            }
+            
+            // If it's an object with an 'items' key, use that array (fallback)
+            if (parsedData.items && Array.isArray(parsedData.items)) {
+                console.log('[normalizeAiPayload] Found items array:', parsedData.items.length, 'items');
+                return parsedData.items;
+            }
+            
+            // If it's directly an array, return it
+            if (Array.isArray(parsedData)) {
+                console.log('[normalizeAiPayload] Data is array:', parsedData.length, 'items');
+                return parsedData;
+            }
+            
+            // If it's an object with event-like fields (title, date, etc), treat as single event
+            if (typeof parsedData === 'object' && (parsedData.title || parsedData.date)) {
+                console.log('[normalizeAiPayload] Treating as single event:', parsedData.title);
+                return [parsedData];
+            }
+            
+            console.warn('[normalizeAiPayload] Unable to normalize data structure');
+            return [];
+        }
+
+        function updateAiProgress() {
+            const progressEl = document.getElementById('aiEventProgress');
+            if (!progressEl) return;
+            if (aiMode && aiEventQueue.length > 1) {
+                progressEl.style.display = 'block';
+                progressEl.textContent = `Event ${aiEventIndex + 1} of ${aiEventQueue.length}`;
+                console.log('[updateAiProgress] Progress:', `${aiEventIndex + 1} of ${aiEventQueue.length}`);
+            } else {
+                progressEl.style.display = 'none';
+                progressEl.textContent = '';
+            }
+        }
+
+        function resetFormFields() {
+            console.log('[resetFormFields] Resetting form fields');
+            eventForm.reset();
+            setAllDayState(false, { enforceValues: false });
+            startTimeInput.value = '';
+            endTimeInput.value = '';
+            durationInput.value = '';
+            eventEndDate.value = '';
+            updateValidationState();
+        }
+
+        function loadAiEventAtIndex(index) {
+            console.log('[loadAiEventAtIndex] Loading event at index:', index, 'of', aiEventQueue.length);
+            if (index < 0 || index >= aiEventQueue.length) {
+                console.warn('[loadAiEventAtIndex] Index out of bounds');
+                return;
+            }
+            resetFormFields();
+            const eventData = aiEventQueue[index];
+            console.log('[loadAiEventAtIndex] Event data:', eventData);
+            populateForm(eventData);
+            updateAiProgress();
+        }
+
+        function detectRepeatFromText(text) {
+            if (!text) return null;
+            const t = text.toLowerCase();
+            if (/(every\s*day|daily|每天|每一天)/.test(t)) return 'daily';
+            if (/(every\s*(2|two)\s*weeks|biweekly|每两周|每2周|隔周)/.test(t)) return 'biweekly';
+            if (/(every\s*week|weekly|每周|每週|每星期)/.test(t)) return 'weekly';
+            if (/(every\s*month|monthly|每月)/.test(t)) return 'monthly';
+            if (/(every\s*year|yearly|每年)/.test(t)) return 'yearly';
+            return null;
+        }
+
+        function applyAllDayFromData(data) {
+            const hasStart = typeof data.start_time === 'string' && data.start_time.trim() !== '';
+            const shouldAllDay = data.all_day === true || !hasStart;
+            setAllDayState(shouldAllDay, { enforceValues: true });
+        }
+
+        // ============================================================================
+        // FORM INITIALIZATION
+        // ============================================================================
+
+        // Initialize form with AI-parsed data
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('[DOMContentLoaded] Starting, aiDataKey:', aiDataKey, 'aiDataFromStash:', aiDataFromStash);
+            
+            if (aiDataKey) {
+                try {
+                    let parsedData = null;
+                    console.log('[DOMContentLoaded] aiDataKey exists, trying to fetch stash data');
+                    
+                    // Always try to fetch from server-side stash first (most reliable)
+                    if (aiDataFromStash || true) {  // Default to stash when key is present
+                        console.log('[DOMContentLoaded] Fetching from server-side stash:', aiDataKey);
+                        const res = await fetch(`/api/ai/stash/${aiDataKey}/`, { credentials: 'include' });
+                        console.log('[DOMContentLoaded] Stash response status:', res.status);
+                        const payload = await res.json();
+                        console.log('[DOMContentLoaded] Stash payload:', payload);
+                        
+                        if (res.ok && payload && payload.data) {
+                            parsedData = payload.data;
+                            console.log('[DOMContentLoaded] Successfully loaded from stash');
+                        } else if (!res.ok) {
+                            console.warn('[DOMContentLoaded] Stash fetch failed with status', res.status);
+                            throw new Error(`Stash fetch failed: ${res.status} ${payload?.error || ''}`);
+                        }
+                    }
+                    
+                    // If no stash data, try sessionStorage (fallback)
+                    if (!parsedData) {
+                        console.log('[DOMContentLoaded] Trying sessionStorage fallback');
+                        const stored = sessionStorage.getItem(aiDataKey);
+                        if (stored) {
+                            parsedData = JSON.parse(stored);
+                            sessionStorage.removeItem(aiDataKey);
+                            console.log('[DOMContentLoaded] Successfully loaded from sessionStorage');
+                        }
+                    }
+                    
+                    if (!parsedData) {
+                        throw new Error('Could not load AI data from any source');
+                    }
+                    
+                    console.log('[DOMContentLoaded] Parsed data:', parsedData);
+                    aiEventQueue = normalizeAiPayload(parsedData);
+                    console.log('[DOMContentLoaded] Normalized to', aiEventQueue.length, 'events');
+                    
+                    if (!aiEventQueue.length) {
+                        showError('AI returned no events. Please try again.');
+                        console.error('[DOMContentLoaded] No events after normalization');
+                    } else {
+                        aiMode = true;
+                        aiEventIndex = 0;
+                        console.log('[DOMContentLoaded] AI mode enabled, loading first event');
+                        loadAiEventAtIndex(aiEventIndex);
+                    }
+                } catch (error) {
+                    console.error('[DOMContentLoaded] Error parsing AI data:', error);
+                    showError('Unable to parse AI data: ' + error.message + '. Please enter again');
+                }
+            } else if (aiDataB64 || aiData) {
+                console.warn('[DOMContentLoaded] Legacy AI transfer method detected, showing error');
+                showError('Legacy AI transfer method is disabled. Please retry from dashboard.');
+            } else if (eventId) {
+                // Load existing event data for editing
+                console.log('[DOMContentLoaded] Editing existing event:', eventId);
+                loadEventData(eventId);
+            }
+            
+            // Initial validation check
+            updateValidationState();
+            console.log('[DOMContentLoaded] Form initialization complete');
+        });
+
+        /**
+         * Populate form with AI-parsed or existing event data
+         */
+        function populateForm(data) {
+            console.log('[populateForm] Populating with data:', data);
+            if (!data) {
+                console.warn('[populateForm] No data to populate');
+                return;
+            }
+            
+            const fullText = [data.description, data.notes, data.title].filter(Boolean).join(' ');
+            const inferredTime = extractExplicitTime(fullText);
+            if (inferredTime && (!data.start_time || data.start_time !== inferredTime)) {
+                console.log('[populateForm] Inferred time from text:', inferredTime);
+                data.start_time = inferredTime;
+                data.all_day = false;
+            }
+            
+            // Populate each field with logging
+            if (data.title) {
+                document.getElementById('eventTitle').value = data.title;
+                console.log('[populateForm] Set title:', data.title);
+            }
+            if (data.date) {
+                eventDateInput.value = data.date;
+                console.log('[populateForm] Set date:', data.date);
+            }
+            if (data.start_time) {
+                startTimeInput.value = data.start_time;
+                console.log('[populateForm] Set start_time:', data.start_time);
+            }
+            if (data.end_time) {
+                endTimeInput.value = data.end_time;
+                console.log('[populateForm] Set end_time:', data.end_time);
+            }
+            if (data.end_date) {
+                eventEndDate.value = data.end_date;
+                console.log('[populateForm] Set end_date:', data.end_date);
+            }
+            if (data.duration) {
+                document.getElementById('duration').value = data.duration;
+                console.log('[populateForm] Set duration:', data.duration);
+            }
+            if (data.location) {
+                document.getElementById('location').value = data.location;
+                console.log('[populateForm] Set location:', data.location);
+            }
+            if (data.description) {
+                document.getElementById('description').value = data.description;
+                console.log('[populateForm] Set description:', data.description);
+            }
+            if (data.participants) {
+                const sanitized = sanitizeParticipantsValue(data.participants);
+                document.getElementById('participants').value = sanitized;
+                console.log('[populateForm] Set participants:', sanitized);
+            }
+            if (data.reminder) {
+                document.getElementById('reminder').value = data.reminder;
+                console.log('[populateForm] Set reminder:', data.reminder);
+            }
+            if (data.category) {
+                document.getElementById('category').value = data.category;
+                console.log('[populateForm] Set category:', data.category);
+            }
+
+            applyAllDayFromData(data);
+
+            const repeatEl = document.getElementById('repeat');
+            let repeatValue = data.repeat || data.recurrence || null;
+            if (!repeatValue || repeatValue === 'never') {
+                const text = [data.title, data.description, data.notes].filter(Boolean).join(' ');
+                const inferred = detectRepeatFromText(text);
+                if (inferred) {
+                    repeatValue = inferred;
+                    console.log('[populateForm] Inferred repeat:', inferred);
+                }
+            }
+            if (repeatValue) {
+                const valid = ['never', 'daily', 'weekly', 'biweekly', 'monthly', 'yearly'];
+                repeatEl.value = valid.includes(repeatValue) ? repeatValue : 'never';
+                console.log('[populateForm] Set repeat:', repeatEl.value);
+            }
+
+            // Auto-fill end time if missing and not all-day
+            if (!allDayToggle.classList.contains('active')) {
+                if (!durationInput.value) {
+                    durationInput.value = '60';
+                    console.log('[populateForm] Set default duration: 60');
+                }
+                if (!endTimeInput.value) {
+                    updateEndTime();
+                    console.log('[populateForm] Updated end time from start_time and duration');
+                }
+            }
+            
+            // Validate after populating
+            updateValidationState();
+            validateParticipants();
+            console.log('[populateForm] Form population complete');
+        }
+
+        /**
+         * Load existing event data from backend (for editing)
+         */
+        async function loadEventData(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/events/${id}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load event data');
+                }
+
+                const data = await response.json();
+                populateForm(data);
+            } catch (error) {
+                console.error('Error loading event data:', error);
+                showError('Failed to load schedule data. Please try again');
+            }
+        }
+
+        /**
+         * Form submission handler - sends data to Django backend
+         */
+        async function fetchGoogleOAuthStatus() {
+            try {
+                const res = await fetch('/api/google/status/', { credentials: 'include' });
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (data && data.ok) {
+                    return data;
+                }
+                return null;
+            } catch (e) {
+                console.debug('Google status check failed', e);
+                return null;
+            }
+        }
+
+        function showGoogleConnectModal() {
+            const modal = document.getElementById('googleConnectModal');
+            if (modal) modal.classList.add('show');
+        }
+
+        async function ensureGoogleConnected() {
+            const status = await fetchGoogleOAuthStatus();
+            if (!status || status.connected !== true) {
+                showGoogleConnectModal();
+                return false;
+            }
+            return true;
+        }
+
+        eventForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Demo: show confirmation modal instead of submitting to backend
+            if (DEMO_MODE) {
+                showCreateConfirm();
+                return;
+            }
+
+            // Validate before submission
+            if (!updateValidationState()) {
+                showError('Please check the date and time format');
+                return;
+            }
+            if (!validateParticipants()) {
+                showError('Invitees must be valid emails, separated by commas');
+                return;
+            }
+
+            // Show loading state
+            const originalContent = submitBtn ? submitBtn.innerHTML : '';
+            const originalTopContent = submitBtnTop ? submitBtnTop.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
+            }
+            if (submitBtnTop) {
+                submitBtnTop.disabled = true;
+                submitBtnTop.innerHTML = '<span class="spinner"></span> Saving...';
+            }
+
+                const connected = await ensureGoogleConnected();
+                if (!connected) {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalContent;
+                    }
+                    if (submitBtnTop) {
+                        submitBtnTop.disabled = false;
+                        submitBtnTop.innerHTML = originalTopContent;
+                    }
+                    return;
+                }
+
+            // Collect form data
+            const isAllDay = allDayToggle.classList.contains('active');
+            const rawStart = startTimeInput.value.trim();
+            const rawDuration = durationInput.value.trim();
+
+            const formData = {
+                title: document.getElementById('eventTitle').value,
+                date: eventDateInput.value,
+                // send defaults when all-day so backend can create a full-day span
+                start_time: isAllDay ? '00:00' : rawStart || '00:00',
+                duration: isAllDay ? 1440 : (parseInt(rawDuration) || 60),
+                all_day: isAllDay,
+                end_date: eventEndDate.value || eventDateInput.value,
+                end_time: isAllDay ? '23:59' : (endTimeInput.value || '23:59'),
+                location: document.getElementById('location').value || null,
+                description: document.getElementById('description').value || null,
+                participants: document.getElementById('participants').value || null,
+                reminder: parseInt(document.getElementById('reminder').value) || 0,
+                repeat: document.getElementById('repeat').value || 'never',
+                travel_time: parseInt(document.getElementById('travelTime').value) || 0,
+                show_as: document.getElementById('showAs').value || 'busy',
+                category: document.getElementById('category').value || 'personal'
+            };
+
+            try {
+                // Send to backend API
+                const url = eventId 
+                    ? `${API_BASE_URL}/events/${eventId}/`  // Update existing event
+                    : `${API_BASE_URL}/events/`;             // Create new event
+                
+                const method = eventId ? 'PUT' : 'POST';
+
+                const csrf = getCsrfToken();
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to create event');
+                }
+
+                const result = await response.json();
+                console.log('Event created/updated successfully:', result);
+
+                // Sync to Google Calendar
+                await syncToGoogle(result);
+
+                // If in AI multi-event mode, load next event after save
+                if (aiMode && aiEventQueue.length > 1 && aiEventIndex < aiEventQueue.length - 1) {
+                    showSuccess('Event saved. Next event loaded.');
+                    aiEventIndex += 1;
+                    loadAiEventAtIndex(aiEventIndex);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalContent;
+                    }
+                    if (submitBtnTop) {
+                        submitBtnTop.disabled = false;
+                        submitBtnTop.innerHTML = originalTopContent;
+                    }
+                    return;
+                }
+
+                // Show success and redirect
+                showSuccess('Successfully added to calendar!');
+                return;
+
+            } catch (error) {
+                console.error('Error submitting event:', error);
+                showError('Failed to create schedule: ' + error.message);
+                
+                // Restore button state
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalContent;
+                }
+                if (submitBtnTop) {
+                    submitBtnTop.disabled = false;
+                    submitBtnTop.innerHTML = originalTopContent;
+                }
+            }
+        });
+
+        /**
+         * Sync event to Google Calendar
+         */
+        async function syncToGoogle(eventData) {
+            try {
+                const csrf = getCsrfToken();
+                const response = await fetch(`${API_BASE_URL}/google/events/sync/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        event_id: eventData.id
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn('Google sync failed, but event was created');
+                    return;
+                }
+                const data = await response.json();
+                console.log('Google event synced:', data);
+            } catch (error) {
+                console.error('Google sync error:', error);
+                // Don't throw - event is still created even if sync fails
+            }
+        }
+
+        /**
+         * Display error message
+         */
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        /**
+         * Display success message
+         */
+        function showSuccess(message) {
+            const modal = document.getElementById('saveSuccessModal');
+            const msgEl = document.getElementById('saveSuccessMessage');
+            if (msgEl) msgEl.textContent = message || 'Successfully added to calendar!';
+            if (modal) modal.classList.add('show');
+        }
+
+        // ==========================
+        // Demo confirm modal logic
+        // ==========================
+        function showCreateConfirm() {
+            let modal = document.getElementById('createConfirm');
+            if (!modal) return;
+            modal.classList.add('show');
+        }
+
+        function closeCreateConfirm() {
+            const modal = document.getElementById('createConfirm');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function confirmCreate() {
+            // In demo, skip backend and redirect back with success flag
+            closeCreateConfirm();
+            window.location.href = 'dashboard.html?added=1';
+        }
+
+        function closeSaveSuccessModal() {
+            const modal = document.getElementById('saveSuccessModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function confirmSaveSuccess() {
+            closeSaveSuccessModal();
+            window.location.href = 'dashboard.html';
+        }
+
+        function closeGoogleConnectModal() {
+            const modal = document.getElementById('googleConnectModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        // ==========================
+        // Initialize form with URL parameters (from dashboard input)
+        // ==========================
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const input = params.get('input');
+            const mode = params.get('mode');
+            
+            if (input && mode === 'manual') {
+                // 用户从 dashboard 直接跳转过来，用他们的输入填充 title 字段
+                document.getElementById('eventTitle').value = input;
+                
+                // 更新说明文字
+                const description = document.querySelector('.schedule-description p');
+                if (description) {
+                    description.textContent = 'You can now manually enter all details for your event. Fill in the form below and click "Create" when ready.';
+                }
+            }
+        });
+    </script>
+
+    <!-- Google Connect Prompt Modal -->
+    <div class="modal-overlay" id="googleConnectModal" onclick="if(event.target===this) closeGoogleConnectModal()">
+        <div class="settings-modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-user-name">Please connect to your Google Calendar</div>
+            </div>
+            <div class="modal-body" style="padding:20px 24px; text-align:center;">
+                <p style="color:var(--text-light); margin-bottom:18px;">To sync events you need to connect your Google Calendar.</p>
+                <div style="display:flex; justify-content:center; gap:12px;">
+                    <a href="connect_to_calendar.html" class="btn" style="background:linear-gradient(135deg,var(--accent) 0%,var(--accent-soft) 100%); color:#fff; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:600;">Connect</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Success Modal -->
+    <div class="modal-overlay" id="saveSuccessModal" onclick="if(event.target===this) closeSaveSuccessModal()">
+        <div class="settings-modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-user-name">Added to Calendar</div>
+            </div>
+            <div class="modal-body">
+                <div style="padding:16px 24px; color:var(--text-light);" id="saveSuccessMessage">Successfully added to calendar!</div>
+                <div style="display:flex; gap:12px; justify-content:flex-end; padding:0 24px 20px;">
+                    <button onclick="confirmSaveSuccess()" style="padding:10px 14px; border-radius:10px; border:none; background:linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%); color:#fff; cursor:pointer;">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Confirmation Modal (Demo) -->
+    <div class="modal-overlay" id="createConfirm" onclick="if(event.target===this) closeCreateConfirm()">
+        <div class="settings-modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-user-name">Confirm schedule creation</div>
+            </div>
+            <div class="modal-body">
+                <div style="padding:16px 24px; color:var(--text-light);">Are you sure you want to create this schedule?</div>
+                <div style="display:flex; gap:12px; justify-content:flex-end; padding:0 24px 20px;">
+                    <button onclick="closeCreateConfirm()" style="padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;">Cancel</button>
+                    <button onclick="confirmCreate()" style="padding:10px 14px; border-radius:10px; border:none; background:linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%); color:#fff; cursor:pointer;">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

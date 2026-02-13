@@ -1,0 +1,560 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect to Calendar - Smart Calendar Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #ff6b6b;
+            --accent-soft: #ee5a6f;
+            --surface: #ffffff;
+            --bg: #f8f9fa;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --border: #e1e8ed;
+            --success: #00b894;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .navbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .navbar-brand {
+            font-family: 'Crimson Pro', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg);
+            border: none;
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: var(--border);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 20px;
+        }
+
+        .page-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Google Connect Section */
+        .caldav-section {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .caldav-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .caldav-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .caldav-input {
+            flex: 1;
+            padding: 14px 16px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn-copy {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
+        }
+
+        .btn-copy:active {
+            transform: scale(0.95);
+        }
+
+        .btn-copy.copied {
+            background: linear-gradient(135deg, var(--success) 0%, #00d2a0 100%);
+        }
+
+        /* Instructions Section */
+        .instructions-section {
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        .section-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .step {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            flex: 1;
+        }
+
+        .step-content {
+            padding-left: 56px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .step-content p {
+            margin-bottom: 12px;
+        }
+
+        .step-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(238, 90, 111, 0.1) 100%);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .code {
+            font-family: 'Courier New', monospace;
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid var(--border);
+        }
+
+        /* Note Box */
+        .note-box {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(238, 90, 111, 0.05) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 32px;
+        }
+
+        .note-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-content {
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 28px;
+            }
+
+            .caldav-input-group {
+                flex-direction: column;
+            }
+
+            .btn-copy {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .step-content {
+                padding-left: 0;
+                margin-top: 12px;
+            }
+        }
+
+        /* Modal overlay used for disconnect confirmation (hidden by default) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand" href="dashboard.html">
+                    <div class="brand-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    Smart Calendar Hub
+                </a>
+                <a href="dashboard.html" class="btn-back">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back
+                </a>
+            </div>
+        </div>
+            <script>
+                async function startGoogleOAuth() {
+                    // Redirect to backend start endpoint
+                    window.location.href = '/oauth/google/start/';
+                }
+
+                async function refreshGoogleStatus() {
+                    try {
+                        const res = await fetch('/api/google/status/', { credentials: 'include' });
+                        if (!res.ok) return;
+                        const data = await res.json();
+                        const statusInput = document.getElementById('googleStatus');
+                        const copyText = document.getElementById('copyText');
+                        const connectBtn = document.getElementById('connectBtn');
+                        if (data && data.ok && data.connected) {
+                            const email = data.account_email || 'your Google account';
+                            statusInput.value = `Connected to ${email}`;
+                            // show Disconnect button (red)
+                            if (copyText) copyText.textContent = 'Disconnect';
+                            if (connectBtn) {
+                                connectBtn.style.background = 'linear-gradient(135deg,var(--accent) 0%,var(--accent-soft) 100%)';
+                                connectBtn.style.color = '#fff';
+                            }
+                            statusInput.style.borderColor = 'var(--success)';
+                        } else {
+                            statusInput.value = 'Not connected';
+                            if (copyText) copyText.textContent = 'Connect Google';
+                            if (connectBtn) {
+                                connectBtn.style.background = '';
+                                connectBtn.style.color = '';
+                            }
+                            statusInput.style.borderColor = '';
+                        }
+                    } catch (e) {
+                        console.debug('Failed to refresh Google status', e);
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    refreshGoogleStatus();
+                });
+            </script>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-title">Connect Google Calendar</h1>
+
+        <!-- Google Connect Section -->
+        <div class="caldav-section">
+            <div class="caldav-label">Google Calendar authorization</div>
+            <div class="caldav-input-group">
+                <input
+                    type="text"
+                    class="caldav-input"
+                    id="googleStatus"
+                    value="Not connected"
+                    readonly>
+                <button id="connectBtn" class="btn-copy" onclick="handleConnectClick()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                    <span id="copyText">Connect Google</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Disconnect Confirmation Modal -->
+        <div class="modal-overlay" id="disconnectConfirm" onclick="if(event.target===this) closeDisconnectConfirm()">
+            <div class="settings-modal" role="dialog" aria-modal="true">
+                <div class="modal-header">
+                    <div class="modal-user-name">Disconnect Google Calendar</div>
+                </div>
+                <div class="modal-body" style="padding:20px 24px; text-align:center;">
+                    <p style="color:var(--text-light); margin-bottom:18px;">Are you sure you want to disconnect your Google account? This will stop automatic syncing.</p>
+                    <div style="display:flex; justify-content:center; gap:12px;">
+                        <button onclick="closeDisconnectConfirm()" style="padding:10px 18px; border-radius:10px; background:var(--bg); border:1px solid var(--border);">Cancel</button>
+                        <button id="confirmDisconnectBtn" onclick="confirmDisconnect()" style="padding:10px 18px; border-radius:10px; background:linear-gradient(135deg,var(--accent) 0%,var(--accent-soft) 100%); color:#fff; border:none;">Disconnect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Instructions Section -->
+        <div class="instructions-section">
+            <div class="section-header">Authorize Google Calendar</div>
+
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Click “Connect Google” to authorize</div>
+                </div>
+                <div class="step-content">
+                    <p>You will be redirected to Google’s OAuth screen.</p>
+                    <p>Sign in with the account you want to sync.</p>
+                    <p>Grant the requested permissions to allow event creation.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Return to AutoPlanner after authorization</div>
+                </div>
+                <div class="step-content">
+                    <p>After approval, Google will redirect you back to this app.</p>
+                    <p>Once connected, newly created schedules will sync to your Google Calendar.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Verify the sync in Google Calendar</div>
+                </div>
+                <div class="step-content">
+                    <p>Create a test schedule in the dashboard.</p>
+                    <p>Open Google Calendar and confirm the event appears on the primary calendar.</p>
+                    <p>If it doesn’t appear, reconnect and try again.</p>
+                </div>
+            </div>
+
+            <!-- Note -->
+            <div class="note-box">
+                <div class="note-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Tip
+                </div>
+                <div class="note-content">
+                    We only request the minimum permission needed to create and update events. You can revoke access at any time from your Google Account security settings.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script>
+        if (window.authHelpers) {
+            window.authHelpers.requireAuth();
+        }
+        function startGoogleOAuth() {
+            window.location.href = '/oauth/google/start/';
+        }
+
+        function handleConnectClick() {
+            const copyText = document.getElementById('copyText');
+            const statusInput = document.getElementById('googleStatus');
+            // If currently shows connected (Disconnect flow)
+            if (copyText && copyText.textContent.trim().toLowerCase() === 'disconnect') {
+                // Show confirm modal
+                const modal = document.getElementById('disconnectConfirm');
+                if (modal) modal.classList.add('show');
+                return;
+            }
+            // Otherwise, start OAuth
+            startGoogleOAuth();
+        }
+
+        function closeDisconnectConfirm() {
+            const modal = document.getElementById('disconnectConfirm');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+            return null;
+        }
+
+        async function confirmDisconnect() {
+            try {
+                const csrf = getCookie('csrftoken') || '';
+                const res = await fetch('/api/google/disconnect/', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrf
+                    }
+                });
+                if (!res.ok) {
+                    console.error('Failed to disconnect');
+                    closeDisconnectConfirm();
+                    return;
+                }
+                const data = await res.json();
+                if (data && data.ok) {
+                    closeDisconnectConfirm();
+                    // refresh status to update UI
+                    refreshGoogleStatus();
+                }
+            } catch (e) {
+                console.error('Error disconnecting', e);
+                closeDisconnectConfirm();
+            }
+        }
+    </script>
+</body>
+</html>

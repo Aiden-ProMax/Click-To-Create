@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^/Library/Frameworks/Python\\.framework/Versions/3\\.12/bin/python3 test_api_integration\\.py 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^sleep 3 && /Library/Frameworks/Python\\.framework/Versions/3\\.12/bin/python3 test_api_endpoints\\.py 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,0 +1,10 @@
+Django>=6.0
+Djangorestframework>=3.16
+caldav>=2.2
+python-dotenv>=1.2
+passlib>=1.7
+requests>=2.31
+google-api-python-client>=2.126
+google-auth>=2.29
+google-auth-oauthlib>=1.2
+google-generativeai>=0.3.1
