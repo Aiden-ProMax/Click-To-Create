@@ -1,6 +1,6 @@
-# AutoPlanner(Working in Progress)
+# Click-To-Create(Working in Progress)
 
-Quickly parse user's natural language/pasted text into structured schedules and sync to user's calendar via Google Calendar API.
+Quickly parse user's natural language/pasted text into structured schedules and create events in Google Calendar with one click.
 
 # This is a Vibe Coding project.
 This project is coding by AI.
